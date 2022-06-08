@@ -4,26 +4,74 @@ import { useNavigation } from '@react-navigation/core';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons'; 
 import { TextInput } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function Login() {
 
     const navigation = useNavigation();
 
     const [load, setLoad] = useState(false)
+    const [loadData, setLoadData] = useState(false)
+    const [id, setId] = useState('')
     const [mail, setMail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordVivible, setPasswordVisible] = useState(true);
     const [passworForgot, setPasswordForgot] = useState(true);
 
-    const Auth = async () => {
+    useEffect(()=>{
+        readData()  
+    },[])
 
+    const readData = async () => {
+
+        try {
+
+            const dataEmail = await AsyncStorage.getItem('@email') || ''
+            const dataPassaword = await AsyncStorage.getItem('@password') || ''
+            const dataToken = await AsyncStorage.getItem('@token') || ''
+            const dataId = await AsyncStorage.getItem('@id') || ''
+            setMail(dataEmail)
+            setPassword(dataPassaword)
+            setId(dataId)
+            setLoadData(true)
+
+        } catch (e) {}
+
+    }
+
+    const saveDataLogin= async (id:any, email:any, password1:any, token:any)=>{
+        try {
+            await AsyncStorage.setItem('@email', email)
+            await AsyncStorage.setItem('@password', password1)
+            await AsyncStorage.setItem('@token', token)
+            await AsyncStorage.setItem('@id', id)
+
+            console.log(email, password1, token)
+            if(token != '')
+            openHome(id)
+
+        } catch (e) {
+            ToastAndroid.showWithGravityAndOffset(
+                `Não foi possivel salvar os dados ${e}`,
+                ToastAndroid.LONG,
+                ToastAndroid.CENTER,
+                25, 50)
+        }
+
+       }
+
+    const Auth = async () => {
         await axios.post('http://172.16.88.123:3333/auth/authenticate',
             {
                 "email": mail,
                 "password": password
             }).then(response => {
                 console.log(response.data.user._id)
-                openHome(response.data.user._id)
+                saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token)
+            }).catch(error => {
+                msgToast("Não foi possivel fazer Login")
+                saveDataLogin(id, mail, password, '')
             })
     }
 
@@ -54,15 +102,33 @@ export default function Login() {
           ToastAndroid.CENTER
         );
     }
-    useEffect(() => {
-
-        navigation.addListener('focus', () => setLoad(!load))
-    }, [load, navigation]);
 
     const openHome = (item: any) => {
         navigation.navigate("Home", item)
 
     }
+
+    const biometric = async (value:any) => {
+
+
+        const authenticationBiometric = await LocalAuthentication.authenticateAsync({
+            promptMessage: "Fazer Login",
+            cancelLabel: "Cancelar",
+            disableDeviceFallback: false,
+        });
+
+        if (authenticationBiometric.success) {
+            Auth()
+        }
+
+    };
+
+    if(loadData == true && id != ''){
+    
+        biometric(id) 
+        setLoadData(false)
+    
+   }
 
     return (
         <View style={styles.container}>
@@ -89,6 +155,7 @@ export default function Login() {
              <View style={styles.inputPassword}>
              <TextInput
                  value={password}
+                 style={{width:"90%"}}
                  placeholder="Password"
                  placeholderTextColor="#000"
                  maxLength={100}
