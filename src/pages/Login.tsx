@@ -7,6 +7,10 @@ import { TextInput } from 'react-native-gesture-handler';
 
 export default function Login(){
 
+    const [load, setLoad] = useState(false)
+    const [mail, setMail] = useState('');
+    const [password, setPassword] = useState('');
+
     async function atualizaDB(){
         const instance = axios.create({
             baseURL: 'http://localhost:3333/',
@@ -20,10 +24,18 @@ export default function Login(){
           })
     }
 
-    const navigation = useNavigation();
+    async function Auth(){
+    
+       await axios.post('http://172.16.88.123:3333/auth/authenticate', 
+        {
+            "email":mail,
+            "password":password
+        }).then(response => {
+            console.log(response.data.token)
+        })
+    }
 
-    const [load, setLoad] = useState(false)
-    const [title, setTitle] = useState('');
+    const navigation = useNavigation();
 
     useEffect(() => {
         atualizaDB()
@@ -39,14 +51,22 @@ export default function Login(){
     return(
         <View style={styles.container}>
             <Text>Teste 1</Text>
-            <TouchableOpacity onPress={() => openHome(' dados carregados da tela de login' + title)}><Text>ir para teste 1</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => Auth()}><Text>Login</Text></TouchableOpacity>
             <TextInput
                 style={styles.inputText}
-                value={title}
+                value={mail}
                 placeholder="E-mail"
                 placeholderTextColor="#000"
                 maxLength={100}
-                onChangeText={(text) => setTitle(text)}
+                onChangeText={(text) => setMail(text)}
+            />
+            <TextInput
+                style={styles.inputText}
+                value={password}
+                placeholder="Password"
+                placeholderTextColor="#000"
+                maxLength={100}
+                onChangeText={(text) => setPassword(text)}
             />
         </View>
     )
@@ -60,9 +80,9 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
     },
     inputText: {
-        width: "90%",
-        height: "70%",
-        backgroundColor: 'white',
+        width: 300,
+        height: 50,
+        backgroundColor: 'red',
         margin: 8,
         borderRadius: 10,
         padding: 10,
