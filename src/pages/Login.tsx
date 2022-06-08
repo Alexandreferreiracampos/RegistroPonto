@@ -13,18 +13,18 @@ export default function Login(){
 
     async function atualizaDB(){
         const instance = axios.create({
-            baseURL: 'http://localhost:3333/',
+            baseURL: 'http://172.16.88.123:3333/',
             timeout: 1000,
-            headers: {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyOWZmNDYxNzgyZTJmZTBlY2JlYWU5YiIsImlhdCI6MTY1NDY0OTk1MywiZXhwIjoxNjU0NzM2MzUzfQ.kDm1aVppgdgGL3sWO-lohVHALcV-FpxUwDZg68LD0wA'}
+            headers: {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYTA5MmJlNzM1YjA4YzdkNDc0ODRmYiIsImlhdCI6MTY1NDY5MDY3NywiZXhwIjoxNjU0Nzc3MDc3fQ.ZzlWPyo0lMdKzcI-ujYLRv4aPJqwBt3ygluzIA79AQM'}
           });
           
-          instance.get('/projects')
+          instance.post('projects/dot_beat')
           .then(response => {
               console.log(response.data)
           })
     }
 
-    async function Auth(){
+    const Auth = async()=>{
     
        await axios.post('http://172.16.88.123:3333/auth/authenticate', 
         {
@@ -51,7 +51,7 @@ export default function Login(){
     return(
         <View style={styles.container}>
             <Text>Teste 1</Text>
-            <TouchableOpacity onPress={() => Auth()}><Text>Login</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => atualizaDB()}><Text>Login</Text></TouchableOpacity>
             <TextInput
                 style={styles.inputText}
                 value={mail}
