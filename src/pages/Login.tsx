@@ -71,7 +71,7 @@ export default function Login() {
                 saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token)
             }).catch(error => {
                 msgToast("Não foi possivel fazer Login")
-                saveDataLogin(id, mail, password, '')
+                saveDataLogin('', mail, '', '')
             })
     }
 
