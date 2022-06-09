@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ToastAndroid} from 'react-nat
 import { useNavigation } from '@react-navigation/core';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons'; 
+import { Entypo } from '@expo/vector-icons'; 
 import { TextInput } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -16,8 +17,15 @@ export default function Login() {
     const [id, setId] = useState('')
     const [mail, setMail] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordVivible, setPasswordVisible] = useState(true);
     const [passworForgot, setPasswordForgot] = useState(true);
+    const [passwordVivible, setPasswordVisible] = useState(true);
+    const [visibleFinger, setVisibleFinger] = useState(true);
+    
+    useEffect(() => {
+        setPassword('')
+        setVisibleFinger(false)
+        navigation.addListener('focus', () => setLoad(!load))
+    }, [load, navigation])
 
     useEffect(()=>{
         readData()  
@@ -61,18 +69,37 @@ export default function Login() {
 
        }
 
-    const Auth = async () => {
-        await axios.post('http://172.16.88.123:3333/auth/authenticate',
+    const Auth = async (value:any) => {
+        if( value == true && password != ""){
+            await axios.post('http://172.16.88.123:3333/auth/authenticate',
             {
                 "email": mail,
                 "password": password
             }).then(response => {
                 console.log(response.data.user._id)
+                
                 saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token)
             }).catch(error => {
                 msgToast("Não foi possivel fazer Login")
                 saveDataLogin('', mail, '', '')
             })
+        }if(value == false && password == ""){
+            setPasswordVisible(true)
+            readData()
+        }else{
+            await axios.post('http://172.16.88.123:3333/auth/authenticate',
+            {
+                "email": mail,
+                "password": password
+            }).then(response => {
+                console.log(response.data.user._id)
+                
+                saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token)
+            }).catch(error => {
+                msgToast("Não foi possivel fazer Login")
+                
+            })
+        }
     }
 
     const forgot=()=>{
@@ -80,8 +107,6 @@ export default function Login() {
     }
 
     const forgotPassword= async ()=>{
-
-
 
         await axios.post('http://172.16.88.123:3333/auth/forgot_password',
             {
@@ -118,7 +143,10 @@ export default function Login() {
         });
 
         if (authenticationBiometric.success) {
-            Auth()
+            Auth('1')
+        }else{
+            setPassword('')
+            setVisibleFinger(false)
         }
 
     };
@@ -169,7 +197,7 @@ export default function Login() {
              </View>
              }
             {passworForgot && 
-            <TouchableOpacity onPress={() => Auth()}  style={styles.button}><Text style={styles.textButton}>Login</Text></TouchableOpacity> 
+            <TouchableOpacity onPress={() => Auth(visibleFinger && true || false)}  style={styles.button}>{visibleFinger && <Text style={styles.textButton}>Login</Text> || <Entypo name="fingerprint" size={30} color="white" />}</TouchableOpacity> 
             || 
             <TouchableOpacity onPress={() => forgotPassword()}  style={styles.button}><Text style={styles.textButton}>Enviar</Text></TouchableOpacity>
             }
