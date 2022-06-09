@@ -23,7 +23,10 @@ export default function Login() {
     
     useEffect(() => {
         setPassword('')
-        setVisibleFinger(false)
+        if(id != ''){
+            setVisibleFinger(false)
+        }
+        
         navigation.addListener('focus', () => setLoad(!load))
     }, [load, navigation])
 
@@ -57,7 +60,7 @@ export default function Login() {
 
             console.log(email, password1, token)
             if(token != '')
-            openHome(id)
+            openHome(email)
 
         } catch (e) {
             ToastAndroid.showWithGravityAndOffset(
@@ -71,7 +74,7 @@ export default function Login() {
 
     const Auth = async (value:any) => {
         if( value == true && password != ""){
-            await axios.post('http://172.16.88.123:3333/auth/authenticate',
+            await axios.post('http://192.168.0.212:3333/auth/authenticate',
             {
                 "email": mail,
                 "password": password
@@ -87,7 +90,7 @@ export default function Login() {
             setPasswordVisible(true)
             readData()
         }else{
-            await axios.post('http://172.16.88.123:3333/auth/authenticate',
+            await axios.post('http://192.168.0.212:3333/auth/authenticate',
             {
                 "email": mail,
                 "password": password
@@ -108,7 +111,7 @@ export default function Login() {
 
     const forgotPassword= async ()=>{
 
-        await axios.post('http://172.16.88.123:3333/auth/forgot_password',
+        await axios.post('http://192.168.0.212:3333/auth/forgot_password',
             {
                 "email": mail
             }).then(response => {
