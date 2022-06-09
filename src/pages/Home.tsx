@@ -1,32 +1,132 @@
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, StatusBar} from 'react-native';
 import axios from 'axios';
-import { useState } from 'react';
+import React from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import LottieView from 'lottie-react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
+import * as Animatable from 'react-native-animatable';
 
 export default function Home({ route }){
 
-    const [hora, setHora] = useState('')
+    const [hora, setHora] = useState('');
+    const [dateNow, setDateNow] = useState('');
+    const [name, setName] = useState('');
+    const [dataJson, setDataJson] = useState(JSON.parse(route.params));
 
-    setInterval(function () {
-    var clock = ((new Date).toLocaleString().substr(11, 8));  
-    setHora(clock);
-}, 1000);
+    const diaSemana = [ 
+        'Domingo ', 
+        'Segundo-Ferreira ', 
+        'Terça-Feirra ', 
+        'Quarta-Feira ', 
+        'Quinta-Feira ', 
+        'Sexta-Feira ', 
+        'Sabado ']
+    const mes = ['Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro']
 
+    useEffect(()=>{
+        const dt = new Date();
+        const dtString = String(dt);
+        const dtNow = diaSemana[dt.getDay()] + '-' +  dt.getDate() + " de " + mes[dt.getMonth()] + " de " + dt.getFullYear();
+
+        setDateNow(dtNow)
+        const Name = dataJson.user.name.split(' ').shift();
+        setName(Name)
+    },[])
+    
+     setInterval(function () {
+        var clock = ((new Date).toLocaleString().substr(11, 8));  
+        setHora(clock);
+    }, 1000);
+    
     const dotBeat = async ()=>{
         const instance = await axios.create({
-            baseURL: 'http://172.16.88.123:3333/',
+            baseURL: 'http://172.16.88.128:3333/',
             timeout: 1000,
-            headers: {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYTA5MmJlNzM1YjA4YzdkNDc0ODRmYiIsImlhdCI6MTY1NDY5MDY3NywiZXhwIjoxNjU0Nzc3MDc3fQ.ZzlWPyo0lMdKzcI-ujYLRv4aPJqwBt3ygluzIA79AQM'}
+            headers: {'Authorization': 'Bearer ' + dataJson.token}
           });
           
           instance.post('projects/dot_beat')
           .then(response => {
           })
     }
+
+    const animation = useRef(null);
+    
+    useEffect(() => {
+       
+    }, []);
+
+    const biometric = async () => {
+        
+        const hora1 = hora
+
+        const authenticationBiometric = await LocalAuthentication.authenticateAsync({
+            promptMessage: `Registrar ponto as: ${hora1}`,
+            disableDeviceFallback: false,
+        });
+
+        if (authenticationBiometric.success) {
+            dotBeat()
+        }else{
+            
+        }
+
+    };
+
     return(
-        <View style={styles.container}>
-            <TouchableOpacity><Text style={{fontSize:50, color:'red'}}>{hora}</Text></TouchableOpacity>
-            <Text>{route.params}</Text>
-        </View>
+        <SafeAreaView style={styles.container}>
+            <StatusBar backgroundColor='rgb(97,136,215)' barStyle="ligth-content"/>
+            <View style={styles.header}>
+                <View style={{alignItems:'center', top:-24}}>
+                <Text style={{fontSize:25, color:'white', padding:8}}>{name}</Text>
+                <Animatable.View animation="slideInUp">
+                <Text style={{fontSize:13, color:'white'}}>{dateNow}</Text>
+                </Animatable.View>
+               
+                </View>
+                <Animatable.View animation="slideInUp" >
+                <Text style={{fontSize:50, color:'white'}}>{hora}</Text>
+                </Animatable.View>
+                
+            </View>
+            
+            <TouchableOpacity
+                style={styles.viewBiometric}
+                onPress={() => {
+                    animation.current?.reset();
+                    animation.current?.play();
+                    biometric()
+                }
+                }
+            ><View style={{borderColor:'rgb(97,136,215)', borderWidth:2, borderRadius:650, width:210, height:210, justifyContent:'center', alignItems:'center'}}>
+                 <LottieView
+                    source={require('../../assets/biometric.json')}
+                    autoPlay
+                    loop={false}
+                    ref={animation}
+                    style={{
+                        width: 300,
+                        height: 300,
+                    }}
+                />
+            </View>
+               
+
+            </TouchableOpacity>
+
+        </SafeAreaView>
     )
 }
 
@@ -35,6 +135,23 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: '#fff',
       alignItems: 'center',
-      justifyContent: 'center',
+      
     },
+    header: {
+        width: '100%',
+        height: '30%',
+        backgroundColor: 'rgb(97,136,215)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: 'black',
+        elevation: 10
+    },
+    viewBiometric: {
+        width: '100%',
+        height: 550,
+        justifyContent: 'center',
+        alignItems: 'center',
+        
+
+    }
   });

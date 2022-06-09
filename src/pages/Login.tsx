@@ -23,6 +23,8 @@ export default function Login() {
     const [passworForgot, setPasswordForgot] = useState(true);
     const [passwordVivible, setPasswordVisible] = useState(true);
     const [visibleFinger, setVisibleFinger] = useState(true);
+    const [cor, setCor] = useState(false)
+
     
     useEffect(() => {
         setPassword('')
@@ -54,14 +56,16 @@ export default function Login() {
 
     }
 
-    const saveDataLogin= async (id:any, email:any, password1:any, token:any)=>{
+    const saveDataLogin= async (id:any, email:any, password1:any, token:any, jsonData:object)=>{
         try {
             await AsyncStorage.setItem('@email', email)
             await AsyncStorage.setItem('@password', password1)
             await AsyncStorage.setItem('@token', token)
             await AsyncStorage.setItem('@id', id)
             if(token != '')
-            openHome(email)
+            var StringJson = JSON.stringify(jsonData)
+
+            openHome(StringJson)
 
         } catch (e) {
             ToastAndroid.showWithGravityAndOffset(
@@ -75,26 +79,26 @@ export default function Login() {
 
     const Auth = async (value:any) => {
         if( value == true && password != ""){
-            await axios.post('http://192.168.0.212:3333/auth/authenticate',
+            await axios.post('http://172.16.88.128:3333/auth/authenticate',
             {
                 "email": mail,
                 "password": password
             }).then(response => {
-                saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token)
+                saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token, response.data)
             }).catch(error => {
                 msgToast("Não foi possivel fazer Login")
-                saveDataLogin('', mail, '', '')
+                saveDataLogin('', mail, '', '', {})
             })
         }if(value == false && password == ""){
             setPasswordVisible(true)
             readData()
         }else{
-            await axios.post('http://192.168.0.212:3333/auth/authenticate',
+            await axios.post('http://172.16.88.128:3333/auth/authenticate',
             {
                 "email": mail,
                 "password": password
             }).then(response => {
-                saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token)
+                saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token, response.data)
             }).catch(error => {
                 msgToast("Não foi possivel fazer Login")   
             })
@@ -107,7 +111,7 @@ export default function Login() {
 
     const forgotPassword= async ()=>{
 
-        await axios.post('http://192.168.0.212:3333/auth/forgot_password',
+        await axios.post('http://172.16.88.128:3333/auth/forgot_password',
             {
                 "email": mail
             }).then(response => {
@@ -118,7 +122,7 @@ export default function Login() {
             }).finally(() => msgToast("Verifique o Email"))
         
     }
-    const msgToast = (value:any) => {
+    const msgToast = (value:String) => {
         ToastAndroid.showWithGravity(
             value,
           ToastAndroid.LONG,
@@ -189,7 +193,7 @@ export default function Login() {
                  onChangeText={(text) => setPassword(text)}
              />
              <TouchableOpacity onPress={()=> setPasswordVisible(!passwordVivible)}>
-                 { passwordVivible && <Ionicons name="ios-eye-off" size={24} color='rgb(0,146,228)'/> || <Ionicons name="ios-eye" size={24} color='rgb(0,146,228)'/> }
+                 { passwordVivible && <Ionicons name="ios-eye-off" size={24} color='rgb(97,136,215)'/> || <Ionicons name="ios-eye" size={24} color='rgb(97,136,215)'/> }
              </TouchableOpacity>
              
              </View>
@@ -235,7 +239,7 @@ const styles = StyleSheet.create({
         height:'15%',
         justifyContent:'center',
         alignItems:'center',
-        backgroundColor: 'rgb(0,146,228)',
+        backgroundColor: 'rgb(97,136,215)',
         shadowColor:'#000',
         elevation:3,
         margin:15
@@ -271,7 +275,7 @@ const styles = StyleSheet.create({
         margin:15,
         justifyContent:'center',
         alignItems:'center',
-        backgroundColor: 'rgb(0,146,228)',
+        backgroundColor: 'rgb(97,136,215)',
         borderRadius:10,
         shadowColor: "#000",
         elevation: 3,
