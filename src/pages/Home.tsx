@@ -1,7 +1,15 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import axios from 'axios';
+import { useState } from 'react';
 
 export default function Home({ route }){
+
+    const [hora, setHora] = useState('')
+
+    setInterval(function () {
+    var clock = ((new Date).toLocaleString().substr(11, 8));  
+    setHora(clock);
+}, 1000);
 
     const dotBeat = async ()=>{
         const instance = await axios.create({
@@ -12,12 +20,11 @@ export default function Home({ route }){
           
           instance.post('projects/dot_beat')
           .then(response => {
-              console.log(response.data.email)
           })
     }
     return(
         <View style={styles.container}>
-            <TouchableOpacity><Text>Registrar Ponto</Text></TouchableOpacity>
+            <TouchableOpacity><Text style={{fontSize:50, color:'red'}}>{hora}</Text></TouchableOpacity>
             <Text>{route.params}</Text>
         </View>
     )

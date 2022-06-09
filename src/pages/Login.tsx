@@ -10,6 +10,9 @@ import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function Login() {
 
+
+    
+  
     const navigation = useNavigation();
 
     const [load, setLoad] = useState(false)
@@ -57,8 +60,6 @@ export default function Login() {
             await AsyncStorage.setItem('@password', password1)
             await AsyncStorage.setItem('@token', token)
             await AsyncStorage.setItem('@id', id)
-
-            console.log(email, password1, token)
             if(token != '')
             openHome(email)
 
@@ -79,8 +80,6 @@ export default function Login() {
                 "email": mail,
                 "password": password
             }).then(response => {
-                console.log(response.data.user._id)
-                
                 saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token)
             }).catch(error => {
                 msgToast("Não foi possivel fazer Login")
@@ -95,12 +94,9 @@ export default function Login() {
                 "email": mail,
                 "password": password
             }).then(response => {
-                console.log(response.data.user._id)
-                
                 saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token)
             }).catch(error => {
-                msgToast("Não foi possivel fazer Login")
-                
+                msgToast("Não foi possivel fazer Login")   
             })
         }
     }
@@ -115,7 +111,6 @@ export default function Login() {
             {
                 "email": mail
             }).then(response => {
-                console.log(response)
                 msgToast("Solicitação enviada com sucesso")
                 setPasswordForgot(true)
             }).catch(error => {
