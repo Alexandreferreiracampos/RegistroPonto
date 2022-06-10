@@ -7,6 +7,10 @@ import LottieView from 'lottie-react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Animatable from 'react-native-animatable';
 import { API_URL } from '../../util';
+import Button from '../component/buttom';
+import { Ionicons } from '@expo/vector-icons'; 
+import { AntDesign } from '@expo/vector-icons'; 
+
 
 export default function Home({ route }){
 
@@ -46,7 +50,7 @@ export default function Home({ route }){
         setName(Name)
     },[])
 
-    setInterval(function () {
+   setInterval(function () {
         var clock = ((new Date).toLocaleString().substr(11, 8));  
         setHora(clock);
     }, 1000);
@@ -106,10 +110,6 @@ export default function Home({ route }){
     }
 
     const animation = useRef(null);
-    
-    useEffect(() => {
-       
-    }, []);
 
     const biometric = async () => {
         
@@ -123,7 +123,12 @@ export default function Home({ route }){
         if (authenticationBiometric.success) {
             dotBeat()
         }else{
-            
+            ToastAndroid.showWithGravityAndOffset(
+                "Cancelado",
+                ToastAndroid.LONG,
+                ToastAndroid.CENTER,
+                25,50
+            )
         }
 
     };
@@ -137,39 +142,41 @@ export default function Home({ route }){
                 <Animatable.View animation="slideInUp">
                 <Text style={{fontSize:13, color:'white'}}>{dateNow}</Text>
                 </Animatable.View>
-               
+
                 </View>
                 <Animatable.View animation="slideInUp" >
                 <Text style={{fontSize:50, color:'white'}}>{hora}</Text>
                 </Animatable.View>
-                
+                <View style={{ width: '100%', height: 30, bottom:15, flexDirection:'row', justifyContent:'space-between', padding:15}}>
+                    <Button title='Registrar' ico=<Ionicons name="finger-print" size={24} color="#777b7e"/>/>
+                    <Button title='Atividades' ico=<AntDesign name="message1" size={24} color="#777b7e" />/>
+                    <Button title='Marcações' ico=<AntDesign name="copy1" size={24} color="#777b7e" />/>
+                </View>
+
             </View>
             
-            <TouchableOpacity
-                style={styles.viewBiometric}
-                onPress={() => {
-                    animation.current?.reset();
-                    animation.current?.play();
-                    biometric()
-                }
-                }
-            ><View style={{borderColor:'rgb(97,136,215)', borderWidth:2, borderRadius:650, width:210, height:210, justifyContent:'center', alignItems:'center'}}>
-                 <LottieView
-                    source={require('../../assets/biometric.json')}
-                    autoPlay
-                    loop={false}
-                    ref={animation}
-                    style={{
-                        width: 300,
-                        height: 300,
-                    }}
-                />
-            </View>
-               
+            <View style={styles.viewBiometric}>
+                <TouchableOpacity
 
+                    onPress={() => {
+                        animation.current?.reset();
+                        animation.current?.play();
+                        biometric()
+                    }
+                    } style={{ borderColor: 'rgb(97,136,215)', borderWidth: 2, borderRadius: 650, width: 210, height: 210, justifyContent: 'center', alignItems: 'center' }}>
+                    <LottieView
+                        source={require('../../assets/biometric.json')}
+                        autoPlay
+                        loop={false}
+                        ref={animation}
+                        style={{
+                            width: 300,
+                            height: 300,
+                        }}
+                    />
             </TouchableOpacity>
-
-        </SafeAreaView>
+            </View>
+           </SafeAreaView>
     )
 }
 
@@ -187,7 +194,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         shadowColor: 'black',
-        elevation: 10
+        elevation: 10,
+        borderBottomEndRadius:15,
+        borderBottomLeftRadius:15
     },
     viewBiometric: {
         width: '100%',
