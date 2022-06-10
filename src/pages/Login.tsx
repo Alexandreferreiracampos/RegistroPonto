@@ -96,9 +96,9 @@ export default function Login() {
                     if(error.response.status == 400){
                         msgToast(err)
                         
-                    }else if(error.response.status == 0){
-                        msgToast('Tempo de resposta perido')
                     }
+                }else{
+                    msgToast("Erro no servidor") 
                 }
               });
         }if(value == false && password == ""){
@@ -119,9 +119,9 @@ export default function Login() {
                     const err = error.response.data.error
                     if(error.response.status == 400){
                         msgToast(err)  
-                    }else if(error.response.status == 0){
-                        msgToast('Tempo de resposta perido')
                     }
+                }else{
+                    msgToast("Erro no servidor") 
                 }
               });
         }
@@ -139,6 +139,8 @@ export default function Login() {
             }).then(response => {
                 if(response.status == 200){
                     msgToast("Email enviado para " + mail)  
+                }else{
+                    msgToast("error") 
                 }
             }).catch(function (error) {
                  
@@ -146,6 +148,8 @@ export default function Login() {
                     const err = "E-mail não encontrado"
                     if(error.response.status == 400){
                         msgToast(err)  
+                    }else{
+                        msgToast("Erro no servidor") 
                     }
                     
                 }
