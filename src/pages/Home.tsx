@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import LottieView from 'lottie-react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Animatable from 'react-native-animatable';
+import config from '../../config';
 
 export default function Home({ route }){
 
@@ -52,7 +53,7 @@ export default function Home({ route }){
     
     const dotBeat = async ()=>{
         const instance = await axios.create({
-            baseURL: 'http://172.16.88.128:3333/',
+            baseURL: config.API_URL+'/',
             timeout: 1000,
             headers: {'Authorization': 'Bearer ' + dataJson.token}
           });
