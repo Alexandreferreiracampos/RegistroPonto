@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import LottieView from 'lottie-react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Animatable from 'react-native-animatable';
-import config from '../../config';
+import { API_URL } from '../../util';
 
 export default function Home({ route }){
 
@@ -55,12 +55,12 @@ export default function Home({ route }){
     
     const dotBeat = async ()=>{
         const instance = await axios.create({
-            baseURL: config.API_URL+'/',
+            baseURL: API_URL,
             timeout: 1000,
             headers: {'Authorization': 'Bearer ' + dataJson.token}
           });
           
-          instance.post('projects/dot_beat')
+          instance.post('/projects/dot_beat')
           .then(response => {
             if(response.status == 200){
                 ToastAndroid.showWithGravityAndOffset(
@@ -69,6 +69,14 @@ export default function Home({ route }){
                     ToastAndroid.CENTER,
                     25,50
                 )
+            }else{
+                ToastAndroid.showWithGravityAndOffset(
+                    "Falha ao Registrar Ponto",
+                    ToastAndroid.LONG,
+                    ToastAndroid.CENTER,
+                    25,50
+                )
+
             }
           }).catch(function (error) {
             if (error.response) {
@@ -85,8 +93,14 @@ export default function Home({ route }){
              
             } else if (error.request) {
               console.log(error.request);
-            } else {
-              console.log('Error', error.message);
+            } else{
+                ToastAndroid.showWithGravityAndOffset(
+                    "Falha ao Registrar Ponto",
+                    ToastAndroid.LONG,
+                    ToastAndroid.CENTER,
+                    25,50
+                )
+
             }
           });
     }

@@ -7,7 +7,7 @@ import { Entypo } from '@expo/vector-icons';
 import { TextInput } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
-import config from '../../config';
+import {API_URL} from '../../util';
 
 export default function Login() {
 
@@ -78,7 +78,7 @@ export default function Login() {
 
     const Auth = async (value:any) => {
         if( value == true && password != ""){
-            await axios.post(config.API_URL+'/auth/authenticate',
+            await axios.post(API_URL+'/auth/authenticate',
             {
                 "email": mail,
                 "password": password
@@ -88,7 +88,7 @@ export default function Login() {
                 } 
             })
             .catch(function (error) {
-                if(error.response.status != 0 && error.response.status == 200){
+                if(error.response.status != 0 && error.response.status != 200){
                     saveDataLogin('', mail, '', '', {})
                 }
                 if (error.response) {
@@ -105,7 +105,7 @@ export default function Login() {
             setPasswordVisible(true)
             readData()
         }else{
-            await axios.post(config.API_URL+'/auth/authenticate',
+            await axios.post(API_URL+'/auth/authenticate',
             {
                 "email": mail,
                 "password": password
@@ -133,7 +133,7 @@ export default function Login() {
 
     const forgotPassword= async ()=>{
 
-        await axios.post(config.API_URL+'/auth/forgot_password',
+        await axios.post(API_URL+'/auth/forgot_password',
             {
                 "email": mail
             }).then(response => {
