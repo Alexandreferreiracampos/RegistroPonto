@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity, StyleSheet, StatusBar} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, StatusBar, ToastAndroid} from 'react-native';
 import axios from 'axios';
 import React from 'react';
 import { useEffect, useState, useRef } from 'react';
@@ -45,11 +45,13 @@ export default function Home({ route }){
         const Name = dataJson.user.name.split(' ').shift();
         setName(Name)
     },[])
-    
-     setInterval(function () {
+
+    setInterval(function () {
         var clock = ((new Date).toLocaleString().substr(11, 8));  
         setHora(clock);
     }, 1000);
+    
+    
     
     const dotBeat = async ()=>{
         const instance = await axios.create({
@@ -60,7 +62,33 @@ export default function Home({ route }){
           
           instance.post('projects/dot_beat')
           .then(response => {
-          })
+            if(response.status == 200){
+                ToastAndroid.showWithGravityAndOffset(
+                    "Ponto registrado com sucesso",
+                    ToastAndroid.LONG,
+                    ToastAndroid.CENTER,
+                    25,50
+                )
+            }
+          }).catch(function (error) {
+            if (error.response) {
+                const err = error.response.data.error
+                if(error.response.status == 401){
+                    ToastAndroid.showWithGravityAndOffset(
+                        err,
+                        ToastAndroid.LONG,
+                        ToastAndroid.CENTER,
+                        25,50
+                    )
+                }
+            
+             
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
     }
 
     const animation = useRef(null);

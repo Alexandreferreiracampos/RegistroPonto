@@ -83,11 +83,24 @@ export default function Login() {
                 "email": mail,
                 "password": password
             }).then(response => {
-                saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token, response.data)
-            }).catch(error => {
-                msgToast("Não foi possivel fazer Login")
-                saveDataLogin('', mail, '', '', {})
+                if(response.status == 200){
+                    saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token, response.data)
+                } 
             })
+            .catch(function (error) {
+                if(error.response.status != 0 && error.response.status == 200){
+                    saveDataLogin('', mail, '', '', {})
+                }
+                if (error.response) {
+                    const err = error.response.data.error
+                    if(error.response.status == 400){
+                        msgToast(err)
+                        
+                    }else if(error.response.status == 0){
+                        msgToast('Tempo de resposta perido')
+                    }
+                }
+              });
         }if(value == false && password == ""){
             setPasswordVisible(true)
             readData()
@@ -97,10 +110,20 @@ export default function Login() {
                 "email": mail,
                 "password": password
             }).then(response => {
-                saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token, response.data)
-            }).catch(error => {
-                msgToast("Não foi possivel fazer Login")   
-            })
+                if(response.status == 200){
+                    saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token, response.data)
+                } 
+            }).catch(function (error) {
+                 
+                if (error.response) {
+                    const err = error.response.data.error
+                    if(error.response.status == 400){
+                        msgToast(err)  
+                    }else if(error.response.status == 0){
+                        msgToast('Tempo de resposta perido')
+                    }
+                }
+              });
         }
     }
 
@@ -114,12 +137,19 @@ export default function Login() {
             {
                 "email": mail
             }).then(response => {
-                msgToast("Solicitação enviada com sucesso")
-                setPasswordForgot(true)
-            }).catch(error => {
-                msgToast("Não foi possivel enviar")
-            }).finally(() => msgToast("Verifique o Email"))
-        
+                if(response.status == 200){
+                    msgToast("Email enviado para " + mail)  
+                }
+            }).catch(function (error) {
+                 
+                if (error.response) {
+                    const err = "E-mail não encontrado"
+                    if(error.response.status == 400){
+                        msgToast(err)  
+                    }
+                    
+                }
+              });
     }
     const msgToast = (value:String) => {
         ToastAndroid.showWithGravity(
@@ -144,7 +174,7 @@ export default function Login() {
         });
 
         if (authenticationBiometric.success) {
-            Auth('1')
+            Auth(true)
         }else{
             setPassword('')
             setVisibleFinger(false)
