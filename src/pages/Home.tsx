@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity, StyleSheet, StatusBar, ToastAndroid} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, StatusBar, ToastAndroid, FlatList} from 'react-native';
 import axios from 'axios';
 import React from 'react';
 import { useEffect, useState, useRef } from 'react';
@@ -18,6 +18,9 @@ export default function Home({ route }){
     const [dateNow, setDateNow] = useState('');
     const [name, setName] = useState('');
     const [dataJson, setDataJson] = useState(JSON.parse(route.params));
+    const [dataJsonBeat, setDataJsonBeat] = useState(dataJson.user.beat);
+    const [msgPonto, seMsgPonto] = useState('Registrar Ponto');
+    const [updateFlastlist, setUpdateFlastlist] = useState(true)
 
     const diaSemana = [ 
         'Domingo ', 
@@ -50,6 +53,7 @@ export default function Home({ route }){
         setName(Name)
     },[])
 
+
    setInterval(function () {
         var clock = ((new Date).toLocaleString().substr(11, 8));  
         setHora(clock);
@@ -67,12 +71,8 @@ export default function Home({ route }){
           instance.post('/projects/dot_beat')
           .then(response => {
             if(response.status == 200){
-                ToastAndroid.showWithGravityAndOffset(
-                    "Ponto registrado com sucesso",
-                    ToastAndroid.LONG,
-                    ToastAndroid.CENTER,
-                    25,50
-                )
+                seMsgPonto(`Ponto Registrado as: ${'\n'}`+hora)
+
             }else{
                 ToastAndroid.showWithGravityAndOffset(
                     "Falha ao Registrar Ponto",
@@ -148,6 +148,7 @@ export default function Home({ route }){
                 setStylesButtom1(false)
                 setStylesButtom2(true)
                 setStylesButtom3(false)
+                setUpdateFlastlist(!updateFlastlist)
             break
             case 3:
                 setStylesButtom1(false)
@@ -179,8 +180,7 @@ export default function Home({ route }){
                 </View>
 
             </View>
-            
-            <View style={styles.viewBiometric}>
+            {stylesButtom1 && <View style={styles.viewBiometric}>
                 <TouchableOpacity
 
                     onPress={() => {
@@ -201,8 +201,33 @@ export default function Home({ route }){
                     />
                    
             </TouchableOpacity>
-            <Text>Registrat ponto</Text>
+            <Text style={{fontSize:25, color:"#777b7e", padding:8, top:20, textAlign:'center'}}>{msgPonto}</Text>
             </View>
+            }
+            {stylesButtom2 && 
+            <View style={styles.viewBiometric}>
+                
+            </View>}
+            {stylesButtom3 && 
+            <View style={styles.viewBiometric}>
+                <View style={{width:'90%', height:'85%', top:22}}>
+                 <FlatList
+                        data={dataJsonBeat}
+                        renderItem={({ item }) =>
+                            <TouchableOpacity style={{ backgroundColor: 'rgb(250,250,250)', shadowColor: "#000", elevation: 1, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, margin: 5 }}>
+                                <View>
+                                    <Text style={{ color:"#777b7e", fontWeight: 'bold' }}>{item.beat}</Text>
+                                </View>
+                            </TouchableOpacity>
+                            
+                        }
+                        keyExtractor={(item) => item.id}  
+                        extraData={updateFlastlist}
+                    />
+                    </View>
+
+            </View>}
+            
            </SafeAreaView>
     )
 }
