@@ -133,6 +133,31 @@ export default function Home({ route }){
 
     };
 
+    const [stylesButtom1, setStylesButtom1] = useState(true)
+    const [stylesButtom2, setStylesButtom2] = useState(false)
+    const [stylesButtom3, setStylesButtom3] = useState(false)
+
+    const teste=(value:any)=>{
+        switch (value) {
+            case 1:
+                setStylesButtom1(true)
+                setStylesButtom2(false)
+                setStylesButtom3(false)
+            break
+            case 2:
+                setStylesButtom1(false)
+                setStylesButtom2(true)
+                setStylesButtom3(false)
+            break
+            case 3:
+                setStylesButtom1(false)
+                setStylesButtom2(false)
+                setStylesButtom3(true)
+            break
+        }
+        
+    }
+
     return(
         <SafeAreaView style={styles.container}>
             <StatusBar backgroundColor='rgb(97,136,215)' barStyle="ligth-content"/>
@@ -148,9 +173,9 @@ export default function Home({ route }){
                 <Text style={{fontSize:50, color:'white'}}>{hora}</Text>
                 </Animatable.View>
                 <View style={{ width: '100%', height: 30, bottom:15, flexDirection:'row', justifyContent:'space-between', padding:15}}>
-                    <Button title='Registrar' ico=<Ionicons name="finger-print" size={24} color="#777b7e"/>/>
-                    <Button title='Atividades' ico=<AntDesign name="message1" size={24} color="#777b7e" />/>
-                    <Button title='Marcações' ico=<AntDesign name="copy1" size={24} color="#777b7e" />/>
+                    <Button title='Registrar'  stylesButtom={stylesButtom1} onPressStyles={()=>teste(1)} ico=<Ionicons name="finger-print" size={24} color="#777b7e"/>/>
+                    <Button title='Atividades' stylesButtom={stylesButtom2} onPressStyles={()=>teste(2)} ico=<AntDesign name="message1" size={24} color="#777b7e"/>/>
+                    <Button title='Marcações' stylesButtom={stylesButtom3} onPressStyles={()=>teste(3)} ico=<AntDesign name="copy1" size={24} color="#777b7e"/>/>
                 </View>
 
             </View>
@@ -163,18 +188,20 @@ export default function Home({ route }){
                         animation.current?.play();
                         biometric()
                     }
-                    } style={{ borderColor: 'rgb(97,136,215)', borderWidth: 2, borderRadius: 650, width: 210, height: 210, justifyContent: 'center', alignItems: 'center' }}>
+                    } style={{ borderColor: 'rgb(97,136,215)', borderWidth: 2, borderRadius: 650, width: 158, height: 158, justifyContent: 'center', alignItems: 'center' }}>
                     <LottieView
                         source={require('../../assets/biometric.json')}
                         autoPlay
                         loop={false}
                         ref={animation}
                         style={{
-                            width: 300,
-                            height: 300,
+                            width: 230,
+                            height: 230,
                         }}
                     />
+                   
             </TouchableOpacity>
+            <Text>Registrat ponto</Text>
             </View>
            </SafeAreaView>
     )
