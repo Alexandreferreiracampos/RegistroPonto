@@ -61,10 +61,16 @@ export default function Login() {
             await AsyncStorage.setItem('@password', password1)
             await AsyncStorage.setItem('@token', token)
             await AsyncStorage.setItem('@id', id)
-            if(token != '')
             var StringJson = JSON.stringify(jsonData)
+            await AsyncStorage.setItem('@jsonData', StringJson)
+        
+            const datajsonData = await AsyncStorage.getItem('@jsonData') || ''
+            const dataToken = await AsyncStorage.getItem('@token') || ''
 
-            openHome(StringJson)
+            if(token != '')
+            
+            
+            openHome(datajsonData)
 
         } catch (e) {
             ToastAndroid.showWithGravityAndOffset(
@@ -130,7 +136,7 @@ export default function Login() {
                 if(response.status == 200){
                     saveDataLogin(response.data.user._id, response.data.user.email, password, response.data.token, response.data)
                 } 
-            }).catch(function (error) {
+            }).catch(async function (error) {
                  
                 if (error.response) {
                     const err = error.response.data.error
@@ -138,12 +144,28 @@ export default function Login() {
                         msgToast(err)  
                     }
                 }else if (error.request) {
-                    ToastAndroid.showWithGravityAndOffset(
-                        "Falha no Login. Timeout",
-                        ToastAndroid.LONG,
-                        ToastAndroid.CENTER,
-                        25,50
-                    )
+                    
+                    const datajsonData = await AsyncStorage.getItem('@jsonData') || ''
+                    const dataEmail = await AsyncStorage.getItem('@email') || ''
+                    const dataPassaword = await AsyncStorage.getItem('@password') || ''
+                    if(dataEmail == mail && dataPassaword == password){
+                        ToastAndroid.showWithGravityAndOffset(
+                            "Carregando modo offline",
+                            ToastAndroid.LONG,
+                            ToastAndroid.CENTER,
+                            25,50
+                        )
+                        openHome(datajsonData)
+                    }else{
+                        ToastAndroid.showWithGravityAndOffset(
+                            "E-mail ou senha Invalido",
+                            ToastAndroid.LONG,
+                            ToastAndroid.CENTER,
+                            25,50
+                        )
+                    }
+                    
+
                 } else{
                     ToastAndroid.showWithGravityAndOffset(
                         "Falha no Login",
