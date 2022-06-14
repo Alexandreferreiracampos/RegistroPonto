@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity, StyleSheet, StatusBar, ToastAndroid, FlatList} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, StatusBar, ToastAndroid, FlatList, Alert} from 'react-native';
 import axios from 'axios';
 import React from 'react';
 import { useEffect, useState, useRef } from 'react';
@@ -57,7 +57,17 @@ export default function Home({ route }){
         const validarPontosOffline = async () => {
             const beatOff = await AsyncStorage.getItem('@beatOff') || null
             if (beatOff != '' && beatOff != null) {
-                registroOff(beatOff)
+                var Stri = JSON.parse(beatOff)
+                registroOff(Stri) 
+               
+                
+            }else{
+                ToastAndroid.showWithGravityAndOffset(
+                    "Nenha Registro Offline",
+                    ToastAndroid.LONG,
+                    ToastAndroid.CENTER,
+                    25,50
+                )
             }
 
         }
@@ -73,35 +83,66 @@ export default function Home({ route }){
     }, 1000);
 
     const saveDataLogin= async (value:any)=>{
-        try {   
-            await AsyncStorage.setItem('@beatOff', value)
+        
+        const beatOff = await AsyncStorage.getItem('@beatOff') 
+        if(value != ''){
+            if(beatOff == null){
+                const valueBeat = [value]
+                var StringJson = JSON.stringify(valueBeat)
+                try {  
             
-       }catch{}
+                    await AsyncStorage.setItem('@beatOff', StringJson)
+                    var Stri = JSON.parse(StringJson)
+                    console.log(Stri)
+               }catch{}
+            }else{
+                var StringJson1 = JSON.parse(beatOff)
+                StringJson1.push(value)
+                var StringJson = JSON.stringify(StringJson1)
+                try {  
+            
+                    await AsyncStorage.setItem('@beatOff', StringJson)
+                    var Stri = JSON.parse(StringJson)
+                    console.log(Stri)
+               }catch{}
+            }
+            
+        }else{
+            await AsyncStorage.removeItem('@beatOff');  
+        }
+        
+        
     }
     
     const registroOff = async (value:any)=>{
 
-        const instance = await axios.create({
-            baseURL: API_URL,
-            timeout: 5000,
-            headers: {'Authorization': 'Bearer ' + dataJson.token}
-          });
+        const lengthStri =  value.length       
+        for(let i=0; lengthStri > i; i++){
+            const instance = await axios.create({
+                baseURL: API_URL,
+                timeout: 9000,
+                headers: {'Authorization': 'Bearer ' + dataJson.token}
+              });
+    
+    
+            await instance.post('/projects/dot_beat',
+                {
+                    "beatOff":value[i]
+                }).then(response => {
+                    if(response.status == 200){
+                        ToastAndroid.showWithGravityAndOffset(
+                            "Atualizando Registros de pontos offlines",
+                            ToastAndroid.LONG,
+                            ToastAndroid.CENTER,
+                            25,50
+                        )
+                       
+                    } 
+                })
 
+        } saveDataLogin('')
 
-        instance.post('/projects/dot_beat',
-            {
-                "beatOff":value
-            }).then(response => {
-                if(response.status == 200){
-                    ToastAndroid.showWithGravityAndOffset(
-                        "Atualizado Batidas offlines",
-                        ToastAndroid.LONG,
-                        ToastAndroid.CENTER,
-                        25,50
-                    )
-                    saveDataLogin('')
-                } 
-            })
+        
     }
     
     const dotBeat = async ()=>{
@@ -115,7 +156,7 @@ export default function Home({ route }){
           .then(response => {
             if(response.status == 200){
                 seMsgPonto(`Ponto Registrado as: ${'\n'}`+hora)
-
+                saveDataLogin('')
             }else{
                 ToastAndroid.showWithGravityAndOffset(
                     "Falha ao Registrar Ponto",
@@ -123,7 +164,7 @@ export default function Home({ route }){
                     ToastAndroid.CENTER,
                     25,50
                 )
-                saveDataLogin('')
+                
             }
           }).catch(function (error) {
             if (error.response) {
@@ -139,8 +180,19 @@ export default function Home({ route }){
             
              
             } else if (error.request) {
-                seMsgPonto( "Falha ao Registrar Ponto. Timeout")
-                saveDataLogin('testeponto')
+                seMsgPonto(`Ponto Registrado as: ${'\n'} ${hora} em modo offline.`)
+                Alert.alert(
+                    "Registro Offline",
+                    "Seus registros serão atualizados assim que entrar novamente online",
+                    [
+                      {
+                        text: "Ok",
+                        style: "cancel",
+                      },
+                    ],
+                   
+                  );
+                saveDataLogin(Date())
                    
             } else{
                 ToastAndroid.showWithGravityAndOffset(
