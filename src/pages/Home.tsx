@@ -10,6 +10,7 @@ import { API_URL } from '../../util';
 import Button from '../component/buttom';
 import { Ionicons } from '@expo/vector-icons'; 
 import { AntDesign } from '@expo/vector-icons'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Home({ route }){
@@ -51,6 +52,18 @@ export default function Home({ route }){
         setDateNow(dtNow)
         const Name = dataJson.user.name.split(' ').shift();
         setName(Name)
+
+       
+        const validarPontosOffline = async () => {
+            const beatOff = await AsyncStorage.getItem('@beatOff') || null
+            if (beatOff != '' && beatOff != null) {
+                registroOff(beatOff)
+            }
+
+        }
+
+        validarPontosOffline()
+        
     },[])
 
 
@@ -58,7 +71,38 @@ export default function Home({ route }){
         var clock = ((new Date).toLocaleString().substr(11, 8));  
         setHora(clock);
     }, 1000);
+
+    const saveDataLogin= async (value:any)=>{
+        try {   
+            await AsyncStorage.setItem('@beatOff', value)
+            
+       }catch{}
+    }
     
+    const registroOff = async (value:any)=>{
+
+        const instance = await axios.create({
+            baseURL: API_URL,
+            timeout: 5000,
+            headers: {'Authorization': 'Bearer ' + dataJson.token}
+          });
+
+
+        instance.post('/projects/dot_beat',
+            {
+                "beatOff":value
+            }).then(response => {
+                if(response.status == 200){
+                    ToastAndroid.showWithGravityAndOffset(
+                        "Atualizado Batidas offlines",
+                        ToastAndroid.LONG,
+                        ToastAndroid.CENTER,
+                        25,50
+                    )
+                    saveDataLogin('')
+                } 
+            })
+    }
     
     const dotBeat = async ()=>{
         const instance = await axios.create({
@@ -79,7 +123,7 @@ export default function Home({ route }){
                     ToastAndroid.CENTER,
                     25,50
                 )
-
+                saveDataLogin('')
             }
           }).catch(function (error) {
             if (error.response) {
@@ -96,6 +140,7 @@ export default function Home({ route }){
              
             } else if (error.request) {
                 seMsgPonto( "Falha ao Registrar Ponto. Timeout")
+                saveDataLogin('testeponto')
                    
             } else{
                 ToastAndroid.showWithGravityAndOffset(
@@ -207,7 +252,7 @@ export default function Home({ route }){
             {stylesButtom2 && 
             <View style={styles.viewBiometric}>
 
-                <TouchableOpacity >
+                <TouchableOpacity onPress={()=>dotBeat()} >
                     <Text>Ola Mundo</Text>
                 </TouchableOpacity>
                 
