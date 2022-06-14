@@ -77,8 +77,12 @@ export default function Login() {
        }
 
     const Auth = async (value:any) => {
+        const instance = await axios.create({
+            baseURL: API_URL,
+            timeout: 5000,
+          });
         if( value == true && password != ""){
-            await axios.post(API_URL+'/auth/authenticate',
+            instance.post('/auth/authenticate',
             {
                 "email": mail,
                 "password": password
@@ -97,15 +101,28 @@ export default function Login() {
                         msgToast(err)
                         
                     }
-                }else{
-                    msgToast("Erro no servidor") 
+                }else if (error.request) {
+                    ToastAndroid.showWithGravityAndOffset(
+                        "Falha no Login. Timeout",
+                        ToastAndroid.LONG,
+                        ToastAndroid.CENTER,
+                        25,50
+                    )
+                } else{
+                    ToastAndroid.showWithGravityAndOffset(
+                        "Falha no Login",
+                        ToastAndroid.LONG,
+                        ToastAndroid.CENTER,
+                        25,50
+                    )
+    
                 }
               });
         }if(value == false && password == ""){
             setPasswordVisible(true)
             readData()
         }else{
-            await axios.post(API_URL+'/auth/authenticate',
+            instance.post('/auth/authenticate',
             {
                 "email": mail,
                 "password": password
@@ -120,8 +137,21 @@ export default function Login() {
                     if(error.response.status == 400){
                         msgToast(err)  
                     }
-                }else{
-                    msgToast("Erro no servidor") 
+                }else if (error.request) {
+                    ToastAndroid.showWithGravityAndOffset(
+                        "Falha no Login. Timeout",
+                        ToastAndroid.LONG,
+                        ToastAndroid.CENTER,
+                        25,50
+                    )
+                } else{
+                    ToastAndroid.showWithGravityAndOffset(
+                        "Falha no Login",
+                        ToastAndroid.LONG,
+                        ToastAndroid.CENTER,
+                        25,50
+                    )
+    
                 }
               });
         }

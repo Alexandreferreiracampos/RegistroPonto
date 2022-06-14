@@ -60,11 +60,10 @@ export default function Home({ route }){
     }, 1000);
     
     
-    
     const dotBeat = async ()=>{
         const instance = await axios.create({
             baseURL: API_URL,
-            timeout: 1000,
+            timeout: 5000,
             headers: {'Authorization': 'Bearer ' + dataJson.token}
           });
           
@@ -96,7 +95,8 @@ export default function Home({ route }){
             
              
             } else if (error.request) {
-              console.log(error.request);
+                seMsgPonto( "Falha ao Registrar Ponto. Timeout")
+                   
             } else{
                 ToastAndroid.showWithGravityAndOffset(
                     "Falha ao Registrar Ponto",
@@ -206,6 +206,10 @@ export default function Home({ route }){
             }
             {stylesButtom2 && 
             <View style={styles.viewBiometric}>
+
+                <TouchableOpacity >
+                    <Text>Ola Mundo</Text>
+                </TouchableOpacity>
                 
             </View>}
             {stylesButtom3 && 
